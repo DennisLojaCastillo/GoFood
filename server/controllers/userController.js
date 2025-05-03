@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import UserModel from '../models/User.js';
 import RecipeModel from '../models/Recipe.js';
 import { ObjectId } from 'mongodb';
+import { io } from '../app.js';
 
 export const userController = (db) => {
   const User = UserModel(db);
@@ -93,9 +94,69 @@ export const userController = (db) => {
     }
   };
 
+  const updateFavorites = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { recipeId, action } = req.body;
+
+      // Validate action
+      if (!['add', 'remove'].includes(action)) {
+        return res.status(400).json({ message: 'Invalid action' });
+      }
+
+      // Hent den aktuelle bruger for at få navn
+      const currentUser = await User.findById(userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Brugerens navn eller email
+      const userName = currentUser.name || currentUser.email;
+
+      // Update user's favorites
+      const userUpdated = await User.updateFavorites(userId, recipeId, action);
+      if (!userUpdated) {
+        return res.status(404).json({ message: 'User not found or update failed' });
+      }
+
+      // Update recipe's favoritedBy list
+      const favoritesUpdated = await Recipe.updateFavoritesByUser(recipeId, userId, action);
+      if (!favoritesUpdated) {
+        return res.status(404).json({ message: 'Failed to update favorites list' });
+      }
+
+      // Find recipe owner
+      const recipeOwner = await Recipe.getRecipeOwner(recipeId);
+      if (recipeOwner && action === 'add') {
+        // Hent opskriftens navn
+        const recipe = await Recipe.findById(recipeId);
+        const recipeName = recipe ? recipe.title : 'recipe';
+
+        const notificationMessage = `<strong>${userName}</strong> has favorited your <strong>${recipeName}</strong> recipe`;
+        
+        console.log('Notification event sent:', {
+          message: notificationMessage,
+          recipeId
+        });
+        
+        // Send notification to recipe owner
+        io.to(recipeOwner.toString()).emit('notification', {
+          message: notificationMessage,
+          recipeId
+        });
+      }
+
+      res.status(200).json({ message: 'Favorites updated successfully' });
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
   return {
     getProfile,
     updateProfile,
-    getUserRecipes
+    getUserRecipes,
+    updateFavorites
   };
-}; 
+};

@@ -12,6 +12,7 @@
   let error = null;
   let recipeId = null;
   let showDeleteModal = false;
+  let isFavorite = false;
 
   function navigate(path) {
     history.pushState({}, '', path);
@@ -89,7 +90,8 @@
         throw new Error('Could not find the recipe');
       }
 
-      recipe = await response.json();  
+      recipe = await response.json();
+      isFavorite = recipe.favoritedBy.includes($user.id);  // Update isFavorite status
     } catch (err) {
       console.error('Error fetching recipe:', err);
       error = err.message;
@@ -120,6 +122,29 @@
       error = err.message;
     } finally {
       showDeleteModal = false;
+    }
+  }
+
+  async function toggleFavorite() {
+    const action = isFavorite ? 'remove' : 'add';
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`http://localhost:3000/api/user/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ recipeId: recipeId, action })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update favorite status');
+      }
+
+      isFavorite = !isFavorite;
+    } catch (err) {
+      console.error('Error updating favorite status:', err);
     }
   }
 
@@ -219,7 +244,9 @@
                 </div>
               {:else}
                 <div class="mt-3">
-                  <!-- Remove favorite button -->
+                  <button class="btn btn-outline-success btn-sm mt-3" on:click={toggleFavorite}>
+                    {#if isFavorite}Remove from favorites{:else}Save as favorite{/if}
+                  </button>
                 </div>
               {/if}
             </div>

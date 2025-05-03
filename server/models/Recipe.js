@@ -4,7 +4,8 @@ export default function RecipeModel(db) {
   const collection = db.collection('recipes');
 
   const createRecipe = async (recipeData) => {
-    const result = await collection.insertOne(recipeData);
+    const recipe = { ...recipeData, favoritesCount: 0, favoritedBy: [] };
+    const result = await collection.insertOne(recipe);
     return result.insertedId;
   };
 
@@ -14,6 +15,11 @@ export default function RecipeModel(db) {
 
   const getRecipeById = async (id) => {
     return await collection.findOne({ _id: new ObjectId(id) });
+  };
+
+  // Alias for getRecipeById for consistency
+  const findById = async (id) => {
+    return await getRecipeById(id);
   };
 
   const updateRecipe = async (id, updateData) => {
@@ -27,6 +33,24 @@ export default function RecipeModel(db) {
   const deleteRecipe = async (id) => {
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount;
+  };
+
+  const updateFavoritesCount = async (id, action) => {
+    const update = action === 'add' ? { $inc: { favoritesCount: 1 } } : { $inc: { favoritesCount: -1 } };
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      update
+    );
+    return result.modifiedCount > 0;
+  };
+
+  const updateFavoritesByUser = async (recipeId, userId, action) => {
+    const update = action === 'add' ? { $addToSet: { favoritedBy: userId }, $inc: { favoritesCount: 1 } } : { $pull: { favoritedBy: userId }, $inc: { favoritesCount: -1 } };
+    const result = await collection.updateOne(
+      { _id: new ObjectId(recipeId) },
+      update
+    );
+    return result.modifiedCount > 0;
   };
 
   // Find recipes created by a specific user
@@ -58,13 +82,22 @@ export default function RecipeModel(db) {
     };
   };
 
+  const getRecipeOwner = async (recipeId) => {
+    const recipe = await collection.findOne({ _id: new ObjectId(recipeId) }, { projection: { createdBy: 1 } });
+    return recipe ? recipe.createdBy : null;
+  };
+
   return {
     createRecipe,
     getAllRecipes,
     getRecipeById,
+    findById,
     updateRecipe,
     deleteRecipe,
     findByUser,
-    getRecipes
+    getRecipes,
+    updateFavoritesCount,
+    getRecipeOwner,
+    updateFavoritesByUser
   };
 }

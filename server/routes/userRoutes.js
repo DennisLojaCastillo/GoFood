@@ -14,4 +14,7 @@ router.put('/api/user/profile', verifyToken, controller.updateProfile);
 // User recipes routes
 router.get('/api/user/recipes', verifyToken, controller.getUserRecipes);
 
+// Favorites management route
+router.post('/api/user/favorites', verifyToken, controller.updateFavorites);
+
 export default router; 

@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import { Server } from 'socket.io';
 
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
@@ -18,9 +19,22 @@ import userRoutes from './routes/userRoutes.js';
 const app = express();
 const server = http.createServer(app);
 
-import { messagesSocket } from './utils/socketsUtil.js';
-messagesSocket(server); // Starter Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    methods: ['GET', 'POST']
+  }
+});
 
+import { messagesSocket } from './utils/socketsUtil.js';
+messagesSocket(io); // Starter Socket.io
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
 
 // Connect to DB
 connectDB();
@@ -80,3 +94,5 @@ app.use(userRoutes); // User routes for profile, favorites, etc.
 // Server
 const PORT = process.env.PORT ?? 3000;
 server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+
+export { io };
