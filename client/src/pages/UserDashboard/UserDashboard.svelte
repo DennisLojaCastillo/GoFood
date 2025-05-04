@@ -37,13 +37,12 @@
       });
 
       if (!response.ok) {
-        console.error('Failed to fetch user created recipes');
         return;
       }
 
       userRecipes = await response.json();      
     } catch (error) {
-      console.error('Error fetching user recipes:', error);
+      // Silent fail
     }
   }
   
@@ -58,13 +57,12 @@
       });
 
       if (!response.ok) {
-        console.error('Failed to fetch favorite recipes');
         return;
       }
 
       favoriteRecipes = await response.json();      
     } catch (error) {
-      console.error('Error fetching favorite recipes:', error);
+      // Silent fail
     }
   }
 
@@ -98,7 +96,6 @@
       recentActivity.sort((a, b) => new Date(b.date) - new Date(a.date));
       
     } catch (err) {
-      console.error('Dashboard initialization error:', err);
       error = err.message;
     } finally {
       isLoading = false;

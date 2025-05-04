@@ -31,7 +31,6 @@
   // Function to navigate to recipe detail
   function viewRecipe() {
     if (!recipe || !recipe._id) {
-      console.error('Cannot navigate to detail view: Recipe ID is missing');
       return;
     }
     
@@ -56,7 +55,6 @@
         day: 'numeric'
       });
     } catch (e) {
-      console.error('Date formatting error:', e);
       return 'Invalid date';
     }
   }

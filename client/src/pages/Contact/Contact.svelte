@@ -77,7 +77,6 @@
     }
     
     // In a real application, you would send the form data to a server here
-    console.log('Form submitted:', { name, email, subject, message });
     formSubmitted = true;
     formError = false;
     

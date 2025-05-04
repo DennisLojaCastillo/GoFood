@@ -92,62 +92,62 @@
 
 <!-- Hero Section with Enhanced Animation -->
 <section class="hero-section">
-  <!-- Background Shapes -->
+    <!-- Background Shapes -->
   <div class="hero-shape shape-1" style="background: linear-gradient(45deg, #80c244, #3ca55c);"></div>
   <div class="hero-shape shape-2" style="background: linear-gradient(45deg, #ffd452, #ff7b1d);"></div>
   <div class="hero-shape shape-3" style="background: linear-gradient(45deg, #5e72e4, #825ee4);"></div>
 
-  <div class="container">
-    <div class="row align-items-center">
-      <!-- Hero Content -->
-      <div class="col-lg-6 hero-content">
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Hero Content -->
+            <div class="col-lg-6 hero-content">
         <h1 class="hero-title">Elevate Your <span class="text-gradient">Culinary</span> Journey</h1>
         <p class="hero-subtitle">Find, create, and share delicious recipes with a community that celebrates the joy of cooking. Turn everyday meals into extraordinary experiences.</p>
-        
-        <!-- CTA Buttons -->
-        <div class="hero-buttons">
+                
+                <!-- CTA Buttons -->
+                <div class="hero-buttons">
           <a href="/recipes" class="btn primary-btn me-3 mb-2">Discover Recipes</a>
           <a href="/signup" class="btn secondary-btn mb-2">Join Our Community</a>
-        </div>
+                </div>
 
-        <!-- Stats -->
+                <!-- Stats -->
         <div class="hero-stats row mt-5">
-          <div class="col-4">
-            <div class="stat-item">
+                    <div class="col-4">
+                        <div class="stat-item">
               <div class="stat-number counter">500+</div>
-              <div class="stat-label">Recipes</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-item">
+                            <div class="stat-label">Recipes</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-item">
               <div class="stat-number counter">10K+</div>
               <div class="stat-label">Users</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-item">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-item">
               <div class="stat-number counter">25+</div>
               <div class="stat-label">Categories</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Hero Image -->
-      <div class="col-lg-6 hero-image">
+            <!-- Hero Image -->
+            <div class="col-lg-6 hero-image">
         <img src="../src/assets/images/Hero_food.png" alt="Delicious Food" class="img-fluid hero-image-main">
-        
+                
         <!-- Floating Cards with Enhanced Design -->
-        <div class="floating-card card-1">
-          <div class="d-flex align-items-center">
+                <div class="floating-card card-1">
+                    <div class="d-flex align-items-center">
             <i class="fas fa-utensils text-primary me-2"></i>
             <span>Tasty recipes daily</span>
-          </div>
-        </div>
-        
-        <div class="floating-card card-2">
-          <div class="d-flex align-items-center">
-            <i class="fas fa-star text-warning me-2"></i>
+                    </div>
+                </div>
+                
+                <div class="floating-card card-2">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star text-warning me-2"></i>
             <span>Top-rated by chefs</span>
           </div>
         </div>
@@ -156,11 +156,11 @@
           <div class="d-flex align-items-center">
             <i class="fas fa-globe text-success me-2"></i>
             <span>Global cuisines</span>
-          </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </section>
 
 <!-- Featured Recipes Section -->
@@ -767,12 +767,6 @@
     margin-right: 15px;
   }
   
-  .testimonial-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
   .testimonial-name {
     font-size: 1.1rem;
     font-weight: 600;
@@ -849,15 +843,7 @@
   }
 
   /* Features Section with white text */
-  .features-section .section-title {
-    color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
   
-  .features-section .section-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-  }
-
   /* CTA Section with white text */
   .cta-section h2 {
     color: #ffffff;

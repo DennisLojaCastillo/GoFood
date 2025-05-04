@@ -210,8 +210,12 @@
               <p class="team-role">{member.role}</p>
               <p class="team-bio">{member.bio}</p>
               <div class="team-social">
-                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com/" class="social-link" aria-label="LinkedIn Profile">
+                  <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://twitter.com/" class="social-link" aria-label="Twitter Profile">
+                  <i class="fab fa-twitter"></i>
+                </a>
               </div>
             </div>
           </div>

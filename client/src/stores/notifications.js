@@ -8,7 +8,7 @@ function getNotificationsFromStorage() {
       try {
         return JSON.parse(storedNotifications);
       } catch (e) {
-        console.error('Could not parse notifications from localStorage', e);
+        return { items: [], unreadCount: 0 };
       }
     }
   }
@@ -28,18 +28,17 @@ function saveNotificationsToStorage(state) {
 // Svelte store with custom methods
 export const notifications = {
   subscribe: notificationStore.subscribe,
-  
-  // Function to add a new notification
+
+// Function to add a new notification
   addNotification: (message) => {
-    console.log('Adding notification:', message);
     notificationStore.update(state => {
       const newState = {
         items: [{ message, read: false, timestamp: new Date().toISOString() }, ...state.items],
-        unreadCount: state.unreadCount + 1
-      };
+      unreadCount: state.unreadCount + 1
+    };
       saveNotificationsToStorage(newState);
       return newState;
-    });
+  });
   },
   
   // Function to mark a specific notification as read
@@ -64,8 +63,8 @@ export const notifications = {
       return newState;
     });
   },
-  
-  // Function to mark all notifications as read
+
+// Function to mark all notifications as read
   markAllAsRead: () => {
     notificationStore.update(state => {
       const items = state.items.map(item => ({ ...item, read: true }));

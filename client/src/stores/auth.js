@@ -11,7 +11,7 @@ function getUserFromStorage() {
       try {
         return JSON.parse(storedUser);
       } catch (e) {
-        console.error('Could not parse user data from localStorage', e);
+        return null;
       }
     }
   }
@@ -63,7 +63,7 @@ if (typeof window !== 'undefined') {
         try {
           user.set(JSON.parse(event.newValue));
         } catch (e) {
-          console.error('Could not parse user data from storage event', e);
+          user.set(null);
         }
       } else {
         user.set(null);

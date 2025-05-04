@@ -55,7 +55,7 @@ h1 {
 .primary-btn {
   background-color: #80c244 !important;
   color: #ffffff !important;
-  border: none;
+border: none;    
   font-weight: 600;
   padding: 0.6rem 1.5rem;
   border-radius: 50px;
@@ -72,7 +72,7 @@ h1 {
 .secondary-btn {
   background: #2c3e50 !important;
   border: none;
-  color: #ffffff !important;
+  color: #ffffff !important;    
   font-weight: 600;
   padding: 0.6rem 1.5rem;
   border-radius: 50px;
@@ -81,7 +81,7 @@ h1 {
 }
 
 .secondary-btn:hover {
-  transform: translateY(-3px);
+transform: translateY(-3px);
   box-shadow: 0 6px 15px rgba(44, 62, 80, 0.3);
   background: #1e2b38 !important;
 }

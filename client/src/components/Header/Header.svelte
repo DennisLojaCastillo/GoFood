@@ -108,8 +108,6 @@
   }
 
   onMount(() => {
-    console.log('Header mounted. Notifications:', $notifications);
-    
     // Add event listeners when component mounts
     if (notificationDropdown) {
       notificationDropdown.addEventListener('shown.bs.dropdown', handleDropdownShown);
@@ -169,7 +167,7 @@
       <div class="d-flex gap-2 align-items-center">
         {#if isLoggedIn()}
           <div class="dropdown me-3" bind:this={notificationDropdown}>
-            <button class="notification-bell position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="notification-bell position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
               <i class="fas fa-bell"></i>
               {#if $notifications && $notifications.unreadCount > 0}
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -181,7 +179,7 @@
             <div class="dropdown-menu dropdown-menu-end notification-menu" aria-labelledby="notificationDropdown">
               <div class="notification-header d-flex justify-content-between align-items-center px-3 py-2">
                 <span class="notification-title">Notifications</span>
-                <button class="btn btn-sm mark-all-btn" on:click={markAllAsRead} title="Mark all as read">
+                <button class="btn btn-sm mark-all-btn" on:click={markAllAsRead} title="Mark all as read" aria-label="Mark all as read">
                   <i class="fas fa-check-double"></i>
                 </button>
               </div>
@@ -206,7 +204,7 @@
                         </div>
                       {/if}
                     </div>
-                  {/each}
+              {/each}
                 {:else}
                   <div class="empty-notification p-3 text-center text-muted">
                     <i class="fas fa-bell-slash mb-2" style="font-size: 2rem;"></i>
@@ -215,7 +213,7 @@
                 {/if}
               </div>
               <div class="notification-footer text-center py-2">
-                <a href="#" class="view-all-link">View all notifications</a>
+                <a href="/notifications" class="view-all-link">View all notifications</a>
               </div>
             </div>
           </div>

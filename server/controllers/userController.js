@@ -22,7 +22,6 @@ export const userController = (db) => {
       const { password, ...userData } = user;
       res.status(200).json({ user: userData });
     } catch (error) {
-      console.error('Error getting profile:', error);
       res.status(500).json({ message: 'Server error' });
     }
   };
@@ -74,7 +73,6 @@ export const userController = (db) => {
         user: userData 
       });
     } catch (error) {
-      console.error('Error updating profile:', error);
       res.status(500).json({ message: 'Server error' });
     }
   };
@@ -89,7 +87,6 @@ export const userController = (db) => {
       
       res.status(200).json(recipes);
     } catch (error) {
-      console.error('Error getting user recipes:', error);
       res.status(500).json({ message: 'Server error' });
     }
   };
@@ -116,7 +113,6 @@ export const userController = (db) => {
       
       res.status(200).json(favoriteRecipes);
     } catch (error) {
-      console.error('Error getting favorite recipes:', error);
       res.status(500).json({ message: 'Server error' });
     }
   };
@@ -161,11 +157,6 @@ export const userController = (db) => {
 
         const notificationMessage = `<strong>${userName}</strong> has favorited your <strong>${recipeName}</strong> recipe`;
         
-        console.log('Notification event sent:', {
-          message: notificationMessage,
-          recipeId
-        });
-        
         // Send notification to recipe owner
         io.to(recipeOwner.toString()).emit('notification', {
           message: notificationMessage,
@@ -175,7 +166,6 @@ export const userController = (db) => {
 
       res.status(200).json({ message: 'Favorites updated successfully' });
     } catch (error) {
-      console.error('Error updating favorites:', error);
       res.status(500).json({ message: 'Server error' });
     }
   };

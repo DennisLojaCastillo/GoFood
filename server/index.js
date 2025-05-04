@@ -55,7 +55,6 @@ app.post('/api/signup', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Signup error:', error);
     res.status(500).json({ message: 'Der skete en fejl ved oprettelse af bruger' });
   }
 });
@@ -69,8 +68,7 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    // Disconnect handler
   });
 });

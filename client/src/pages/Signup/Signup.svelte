@@ -53,7 +53,6 @@
       navigate('/user');
     } catch (error) {
       errorMessage = error.message || 'An error occurred during signup';
-      console.error('Signup error:', error);
     } finally {
       isLoading = false;
     }

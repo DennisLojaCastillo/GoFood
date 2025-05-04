@@ -165,7 +165,6 @@
 
       return data.imageUrl;
     } catch (error) {
-      console.error('Image upload error:', error);
       throw error;
     } finally {
       isUploading = false;
@@ -229,7 +228,6 @@
       imagePreview = getImageUrl(recipe.imageUrl);
       
     } catch (err) {
-      console.error('Error fetching recipe:', err);
       errorMessage = err.message;
       setTimeout(() => navigate('/recipes'), 3000);
     } finally {
@@ -323,7 +321,6 @@
       
     } catch (error) {
       errorMessage = error.message || 'An error occurred while updating the recipe';
-      console.error('Update recipe error:', error);
       // Scroll to top to show the error message
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
@@ -457,6 +454,7 @@
                           document.getElementById('recipeImage').value = '';
                         }}
                         disabled={isLoading}
+                        aria-label="Remove image"
                       >
                         <i class="fas fa-times"></i>
                       </button>

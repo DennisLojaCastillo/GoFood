@@ -108,7 +108,6 @@
       userToDelete = null;
     } catch (err) {
       deleteError = err.message;
-      console.error('Delete error:', err);
       
       // Close modal
       showDeleteModal = false;
@@ -265,7 +264,7 @@
   <div class="delete-modal" in:fade={{ duration: 300 }}>
     <div class="modal-header">
       <h4 class="modal-title">Confirm Deletion</h4>
-      <button type="button" class="modal-close" on:click={cancelDelete}>
+      <button type="button" class="modal-close" on:click={cancelDelete} aria-label="Close modal">
         <i class="fas fa-times"></i>
       </button>
     </div>

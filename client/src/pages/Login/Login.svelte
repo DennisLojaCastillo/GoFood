@@ -40,7 +40,6 @@
       navigate('/user');
     } catch (error) {
       errorMessage = error.message || 'An error occurred during login';
-      console.error('Login error:', error);
     } finally {
       isLoading = false;
     }

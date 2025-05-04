@@ -101,7 +101,6 @@
       }, 100);
       
     } catch (err) {
-      console.error('Error fetching recipe:', err);
       error = err.message;
     } finally {
       isLoading = false;
@@ -126,7 +125,6 @@
       // Navigate back to recipes list after successful deletion
       navigate('/recipes');
     } catch (err) {
-      console.error('Error deleting recipe:', err);
       error = err.message;
     } finally {
       showDeleteModal = false;
@@ -152,7 +150,7 @@
 
       isFavorite = !isFavorite;
     } catch (err) {
-      console.error('Error updating favorite status:', err);
+      // Silent fail
     }
   }
 
@@ -313,7 +311,7 @@
     <div class="delete-modal" in:fade={{ duration: 300 }}>
       <div class="modal-header">
         <h4 class="modal-title">Confirm Deletion</h4>
-        <button type="button" class="modal-close" on:click={() => showDeleteModal = false}>
+        <button type="button" class="modal-close" on:click={() => showDeleteModal = false} aria-label="Close modal">
           <i class="fas fa-times"></i>
         </button>
       </div>

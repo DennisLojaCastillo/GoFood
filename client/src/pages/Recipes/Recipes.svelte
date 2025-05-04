@@ -36,11 +36,11 @@
       }
       
       recipes = await response.json();
-    } catch (err) {
-      console.error('Error fetching recipes:', err);
-      error = err.message;
-    } finally {
       isLoading = false;
+    } catch (err) {
+      error = err.message || 'An error occurred while fetching recipes';
+      isLoading = false;
+    } finally {
       // Trigger fade-in animations
       setTimeout(() => {
         visible = true;

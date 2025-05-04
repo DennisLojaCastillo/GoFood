@@ -121,7 +121,6 @@
 
       return data.imageUrl;
     } catch (error) {
-      console.error('Image upload error:', error);
       throw error;
     } finally {
       isUploading = false;
@@ -206,7 +205,6 @@
       
     } catch (error) {
       errorMessage = error.message || 'An error occurred while creating the recipe';
-      console.error('Create recipe error:', error);
       // Scroll to top to show the error message
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
@@ -314,6 +312,7 @@
                           imagePreview = null;
                           document.getElementById('recipeImage').value = '';
                         }}
+                        aria-label="Remove image"
                       >
                         <i class="fas fa-times"></i>
                       </button>

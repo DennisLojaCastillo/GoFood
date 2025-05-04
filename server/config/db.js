@@ -8,9 +8,9 @@ const dbName = 'GoFood';
 export const connectDB = async () => {
   try {
     await client.connect();
-    console.log('✅ MongoDB connected');
+    // Database connection successful
   } catch (error) {
-    console.error('❌ Connection error:', error.message);
+    // Database connection failed
     process.exit(1);
   }
 };

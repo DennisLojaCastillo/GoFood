@@ -29,12 +29,6 @@ const io = new Server(server, {
 import { messagesSocket } from './utils/socketsUtil.js';
 messagesSocket(io); // Starter Socket.io
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
 
 // Connect to DB
 connectDB();
@@ -88,11 +82,13 @@ app.use(helmet({
 app.use(authRoutes);
 app.use(recipeRoutes);
 app.use(adminRoutes);
-app.use(uploadRoutes); // aktiver upload-route
-app.use(userRoutes); // User routes for profile, favorites, etc.
+app.use(uploadRoutes); 
+app.use(userRoutes); 
 
 // Server
 const PORT = process.env.PORT ?? 3000;
-server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+server.listen(PORT, () => {
+  // Server started successfully
+});
 
 export { io };

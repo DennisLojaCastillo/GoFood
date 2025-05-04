@@ -107,7 +107,6 @@
       
       successMessage = 'Profile updated successfully';
     } catch (err) {
-      console.error('Profile update error:', err);
       error = err.message;
     } finally {
       isSaving = false;
