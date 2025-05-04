@@ -7,6 +7,7 @@
   // Data states
   let overviewData = null;
   let users = [];
+  let recipes = [];
   let loading = true;
   let error = null;
   let deleteError = null;
@@ -16,6 +17,8 @@
   // Modal state
   let showDeleteModal = false;
   let userToDelete = null;
+  let recipeToDelete = null;
+  let deleteType = null; // 'user' or 'recipe'
 
   onMount(async () => {
     // Check if user is admin
@@ -50,6 +53,20 @@
       }
 
       users = await usersResponse.json();
+      
+      // Fetch all recipes
+      const recipesResponse = await fetch('http://localhost:3000/api/admin/recipes', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!recipesResponse.ok) {
+        throw new Error('Could not fetch recipe data');
+      }
+
+      recipes = await recipesResponse.json();
+      
       loading = false;
       
       // Trigger fade-in animations
@@ -64,8 +81,15 @@
   });
   
   // Open delete confirmation modal
-  function confirmDelete(userId) {
-    userToDelete = userId;
+  function confirmDelete(id, type) {
+    if (type === 'user') {
+      userToDelete = id;
+      recipeToDelete = null;
+    } else if (type === 'recipe') {
+      recipeToDelete = id;
+      userToDelete = null;
+    }
+    deleteType = type;
     showDeleteModal = true;
   }
   
@@ -73,45 +97,87 @@
   function cancelDelete() {
     showDeleteModal = false;
     userToDelete = null;
+    recipeToDelete = null;
+    deleteType = null;
   }
 
-  async function deleteUser() {
+  async function deleteItem() {
     deleteError = null;
     deleteSuccess = null;  
 
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/users/${userToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      if (deleteType === 'user') {
+        const response = await fetch(`http://localhost:3000/api/admin/users/${userToDelete}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Could not delete user');
         }
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Could not delete user');
-      }
+        // Remove user from list
+        users = users.filter(user => {        
+          return user._id !== userToDelete;
+        });
+        deleteSuccess = 'User deleted';
 
-      // Remove user from list
-      users = users.filter(user => {        
-        return user._id !== userToDelete;
-      });
-      deleteSuccess = 'User deleted successfully';
+        // Update overview counts
+        if (overviewData) {
+          overviewData.totalUsers -= 1;
+        }
+      } else if (deleteType === 'recipe') {
+        const response = await fetch(`http://localhost:3000/api/admin/recipes/${recipeToDelete}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-      // Update overview counts
-      if (overviewData) {
-        overviewData.totalUsers -= 1;
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Could not delete recipe');
+        }
+
+        // Remove recipe from list
+        recipes = recipes.filter(recipe => {        
+          return recipe._id !== recipeToDelete;
+        });
+        
+        // Update user recipe count if the user still exists
+        const deletedRecipe = recipes.find(r => r._id === recipeToDelete);
+        if (deletedRecipe) {
+          const userIndex = users.findIndex(u => u._id === deletedRecipe.createdBy);
+          if (userIndex >= 0 && users[userIndex].recipeCount > 0) {
+            users[userIndex].recipeCount -= 1;
+            users = [...users]; // Trigger reactivity
+          }
+        }
+        
+        deleteSuccess = 'Recipe deleted';
+
+        // Update overview counts
+        if (overviewData) {
+          overviewData.totalRecipes -= 1;
+        }
       }
       
       // Close modal
       showDeleteModal = false;
       userToDelete = null;
+      recipeToDelete = null;
+      deleteType = null;
     } catch (err) {
       deleteError = err.message;
       
       // Close modal
       showDeleteModal = false;
       userToDelete = null;
+      recipeToDelete = null;
+      deleteType = null;
     }
   }
 </script>
@@ -207,7 +273,7 @@
         <div class="users-card" in:fade={{ duration: 500, delay: 400 }}>
           <div class="users-card-header">
             <h2 class="section-title">
-              <i class="fas fa-user-cog me-2"></i> Users and Recipes
+              <i class="fas fa-user-cog me-2"></i> Users 
             </h2>
           </div>
           <div class="users-card-body">
@@ -237,7 +303,7 @@
                         {#if user.role !== 'admin'}
                           <button 
                             class="action-btn delete-btn" 
-                            on:click={() => confirmDelete(user._id)}>
+                            on:click={() => confirmDelete(user._id, 'user')}>
                             <i class="fas fa-trash-alt me-2"></i> Delete
                           </button>
                         {:else}
@@ -245,6 +311,60 @@
                             <i class="fas fa-lock me-2"></i> Admin
                           </button>
                         {/if}
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recipes Table -->
+        <div class="users-card" in:fade={{ duration: 500, delay: 600 }}>
+          <div class="users-card-header">
+            <h2 class="section-title">
+              <i class="fas fa-utensils me-2"></i> All Recipes
+            </h2>
+          </div>
+          <div class="users-card-body">
+            <div class="table-responsive">
+              <table class="users-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Created By</th>
+                    <th>User Email</th>
+                    <th>Favorites</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each recipes as recipe, i}
+                    <tr in:fade={{ duration: 300, delay: 700 + (i * 50) }}>
+                      <td>
+                        <div class="recipe-title-cell">
+                          {#if recipe.imageUrl}
+                            <div class="recipe-thumbnail">
+                              <img src={recipe.imageUrl.startsWith('http') ? recipe.imageUrl : `http://localhost:3000${recipe.imageUrl}`} alt={recipe.title} />
+                            </div>
+                          {/if}
+                          <span>{recipe.title}</span>
+                        </div>
+                      </td>
+                      <td>{recipe.createdByName}</td>
+                      <td>{recipe.createdByEmail}</td>
+                      <td>
+                        <span class="favorites-badge">
+                          <i class="fas fa-heart me-1"></i> {recipe.favoritesCount}
+                        </span>
+                      </td>
+                      <td>
+                        <button 
+                          class="action-btn delete-btn" 
+                          on:click={() => confirmDelete(recipe._id, 'recipe')}>
+                          <i class="fas fa-trash-alt me-2"></i> Delete
+                        </button>
                       </td>
                     </tr>
                   {/each}
@@ -269,15 +389,27 @@
       </button>
     </div>
     <div class="modal-body">
-      <p>Are you sure you want to delete this user?</p>
-      <p class="warning-text">This action cannot be undone. All user data including their recipes will be permanently deleted.</p>
+      {#if deleteType === 'user'}
+        <p>Are you sure you want to delete this user?</p>
+        <p class="warning-text">This action cannot be undone. All user data including recipes will be permanently deleted.</p>
+      {:else if deleteType === 'recipe'}
+        <p>Are you sure you want to delete this recipe?</p>
+        <p class="warning-text">This action cannot be undone. The recipe will be permanently deleted.</p>
+      {/if}
     </div>
     <div class="modal-footer">
       <button type="button" class="modal-btn cancel-btn" on:click={cancelDelete}>
         <i class="fas fa-times me-2"></i> Cancel
       </button>
-      <button type="button" class="modal-btn confirm-btn" on:click={deleteUser}>
-        <i class="fas fa-trash-alt me-2"></i> Delete User
+      <button type="button" class="modal-btn confirm-btn" on:click={deleteItem}>
+        <i class="fas fa-trash-alt me-2"></i> 
+        {#if deleteType === 'user'}
+          Delete User
+        {:else if deleteType === 'recipe'}
+          Delete Recipe
+        {:else}
+          Delete
+        {/if}
       </button>
     </div>
   </div>
@@ -539,7 +671,7 @@
     cursor: not-allowed;
   }
   
-  /* Modal */
+  /* Delete Confirmation Modal */
   .modal-backdrop {
     position: fixed;
     top: 0;
@@ -643,6 +775,39 @@
     box-shadow: 0 6px 15px rgba(255, 91, 91, 0.3);
   }
   
+  /* Recipe table styles */
+  .recipe-title-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .recipe-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  
+  .recipe-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .favorites-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: #fff0f0;
+    color: #ff5b5b;
+    box-shadow: 0 2px 5px rgba(255, 91, 91, 0.1);
+  }
+  
   /* Responsive styles */
   @media (max-width: 768px) {
     .gradient-text {
@@ -674,6 +839,17 @@
     .action-btn {
       padding: 0.4rem 0.8rem;
       font-size: 0.8rem;
+    }
+
+    .recipe-title-cell {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .recipe-thumbnail {
+      width: 40px;
+      height: 40px;
     }
   }
 </style>

@@ -17,6 +17,7 @@
   async function fetchRecipes() {
     if (!$user) {
       isLoading = false;
+      visible = true;
       return;
     }
     
