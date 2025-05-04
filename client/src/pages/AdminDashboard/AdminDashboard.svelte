@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { user } from '../../stores/auth.js'; 
   import { currentRoute } from '../../stores/router.js';
+  import { fade } from 'svelte/transition';
 
   // Data states
   let overviewData = null;
@@ -10,6 +11,7 @@
   let error = null;
   let deleteError = null;
   let deleteSuccess = null;
+  let visible = false;
   
   // Modal state
   let showDeleteModal = false;
@@ -49,6 +51,12 @@
 
       users = await usersResponse.json();
       loading = false;
+      
+      // Trigger fade-in animations
+      setTimeout(() => {
+        visible = true;
+      }, 100);
+      
     } catch (err) {
       error = err.message;
       loading = false;
@@ -110,111 +118,140 @@
 </script>
 
 <div class="admin-dashboard-section">
-  <div class="container mt-4">
-    <h1 class="mb-4">Admin Dashboard</h1>
-
+  <div class="container py-5">
     {#if loading}
-      <div class="text-center my-5">
-        <div class="spinner-border" role="status">
+      <div class="text-center py-5">
+        <div class="spinner-grow text-success" role="status" style="width: 3rem; height: 3rem;">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2">Loading admin data...</p>
+        <p class="mt-3 text-muted">Loading admin data...</p>
       </div>
     {:else if error}
-      <div class="alert alert-danger" role="alert">
-        {error}
+      <div class="alert-card error" role="alert" in:fade={{ duration: 300 }}>
+        <i class="fas fa-exclamation-circle me-2"></i> {error}
       </div>
-    {:else}
-      <!-- Overview Cards -->
-      <div class="row mb-4">
-        <div class="col-md-4">
-          <div class="card h-100">
-            <div class="card-body text-center">
-              <h5 class="card-title">Total Users</h5>
-              <h2 class="display-4">{overviewData.totalUsers}</h2>
+    {:else if visible}
+      <div in:fade={{ duration: 500, delay: 100 }}>
+        <!-- Page Title -->
+        <div class="text-center mb-5" in:fade={{ duration: 500, delay: 200 }}>
+          <h1 class="gradient-text">Admin Dashboard</h1>
+          <p class="lead-text">Manage users and monitor site activity</p>
+        </div>
+        
+        <!-- Overview Cards -->
+        <div class="row g-4 mb-5" in:fade={{ duration: 500, delay: 300 }}>
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="stat-card-body">
+                <div class="stat-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                  <h5 class="stat-title">Total Users</h5>
+                  <div class="stat-value">{overviewData.totalUsers}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="stat-card-body">
+                <div class="stat-icon">
+                  <i class="fas fa-utensils"></i>
+                </div>
+                <div class="stat-content">
+                  <h5 class="stat-title">Total Recipes</h5>
+                  <div class="stat-value">{overviewData.totalRecipes}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="stat-card-body">
+                <div class="stat-icon">
+                  <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-content">
+                  <h5 class="stat-title">Latest User</h5>
+                  <div class="stat-latest-user">
+                    <span class="user-name">{overviewData.latestUser.name}</span>
+                    <span class="user-email">{overviewData.latestUser.email}</span>
+                    <span class="user-date">Joined: {new Date(overviewData.latestUser.createdAt).toLocaleString('en-GB')}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="card h-100">
-            <div class="card-body text-center">
-              <h5 class="card-title">Total Recipes</h5>
-              <h2 class="display-4">{overviewData.totalRecipes}</h2>
-            </div>
+
+        <!-- Delete messages -->
+        {#if deleteSuccess}
+          <div class="alert-card success" role="alert" in:fade={{ duration: 300 }}>
+            <i class="fas fa-check-circle me-2"></i> {deleteSuccess}
+            <button type="button" class="alert-close" on:click={() => deleteSuccess = null} aria-label="Close">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card h-100">
-            <div class="card-body text-center">
-              <h5 class="card-title">Latest User</h5>
-              <h6 class="card-subtitle mb-2 text-muted">{overviewData.latestUser.name}</h6>
-              <p class="card-text">{overviewData.latestUser.email}</p>
-              <p class="card-text"><small class="text-muted">Created: {new Date(overviewData.latestUser.createdAt).toLocaleString('en-US')}</small></p>
-            </div>
+        {/if}
+
+        {#if deleteError}
+          <div class="alert-card error" role="alert" in:fade={{ duration: 300 }}>
+            <i class="fas fa-exclamation-circle me-2"></i> {deleteError}
+            <button type="button" class="alert-close" on:click={() => deleteError = null} aria-label="Close">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        </div>
-      </div>
+        {/if}
 
-      <!-- Delete messages -->
-      {#if deleteSuccess}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {deleteSuccess}
-          <button type="button" class="btn-close" on:click={() => deleteSuccess = null} aria-label="Close"></button>
-        </div>
-      {/if}
-
-      {#if deleteError}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          {deleteError}
-          <button type="button" class="btn-close" on:click={() => deleteError = null} aria-label="Close"></button>
-        </div>
-      {/if}
-
-      <!-- Users Table -->
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Users and Recipes</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Recipe Count</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#each users as user}
+        <!-- Users Table -->
+        <div class="users-card" in:fade={{ duration: 500, delay: 400 }}>
+          <div class="users-card-header">
+            <h2 class="section-title">
+              <i class="fas fa-user-cog me-2"></i> Users and Recipes
+            </h2>
+          </div>
+          <div class="users-card-body">
+            <div class="table-responsive">
+              <table class="users-table">
+                <thead>
                   <tr>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span class="badge {user.role === 'admin' ? 'bg-danger' : 'bg-success'}">
-                        {user.role === 'admin' ? 'Administrator' : 'User'}
-                      </span>
-                    </td>
-                    <td>{user.recipeCount}</td>
-                    <td>
-                      {#if user.role !== 'admin'}
-                        <button 
-                          class="btn btn-sm btn-danger" 
-                          on:click={() => confirmDelete(user._id)}>
-                          <i class="bi bi-trash"></i> Delete
-                        </button>
-                      {:else}
-                        <button class="btn btn-sm btn-secondary" disabled>
-                          <i class="bi bi-lock"></i> Admin
-                        </button>
-                      {/if}
-                    </td>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Recipe Count</th>
+                    <th>Actions</th>
                   </tr>
-                {/each}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {#each users as user, i}
+                    <tr in:fade={{ duration: 300, delay: 500 + (i * 50) }}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span class="role-badge {user.role === 'admin' ? 'admin' : 'user'}">
+                          {user.role === 'admin' ? 'Administrator' : 'User'}
+                        </span>
+                      </td>
+                      <td>{user.recipeCount}</td>
+                      <td>
+                        {#if user.role !== 'admin'}
+                          <button 
+                            class="action-btn delete-btn" 
+                            on:click={() => confirmDelete(user._id)}>
+                            <i class="fas fa-trash-alt me-2"></i> Delete
+                          </button>
+                        {:else}
+                          <button class="action-btn admin-btn" disabled>
+                            <i class="fas fa-lock me-2"></i> Admin
+                          </button>
+                        {/if}
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -224,22 +261,25 @@
 
 <!-- Delete Confirmation Modal -->
 {#if showDeleteModal}
-<div class="modal-backdrop fade show"></div>
-<div class="modal fade show d-block" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Delete</h5>
-        <button type="button" class="btn-close" on:click={cancelDelete} aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete this user?</p>
-        <p>This action cannot be undone.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" on:click={cancelDelete}>Cancel</button>
-        <button type="button" class="btn btn-danger" on:click={deleteUser}>Delete User</button>
-      </div>
+<div class="modal-backdrop" in:fade={{ duration: 200 }}>
+  <div class="delete-modal" in:fade={{ duration: 300 }}>
+    <div class="modal-header">
+      <h4 class="modal-title">Confirm Deletion</h4>
+      <button type="button" class="modal-close" on:click={cancelDelete}>
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this user?</p>
+      <p class="warning-text">This action cannot be undone. All user data including their recipes will be permanently deleted.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="modal-btn cancel-btn" on:click={cancelDelete}>
+        <i class="fas fa-times me-2"></i> Cancel
+      </button>
+      <button type="button" class="modal-btn confirm-btn" on:click={deleteUser}>
+        <i class="fas fa-trash-alt me-2"></i> Delete User
+      </button>
     </div>
   </div>
 </div>
@@ -250,32 +290,391 @@
     background: #ffffff;
     padding: 0;
     position: relative;
-    overflow: hidden;
+    min-height: 85vh;
   }
-  .card {
-    transition: transform 0.3s, box-shadow 0.3s;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #80c244 0%, #2c3e50 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 3rem;
+    margin-bottom: 1rem;
   }
-  .card:hover {
+  
+  .lead-text {
+    color: #6c757d;
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto 1rem;
+  }
+  
+  /* Alert Cards */
+  .alert-card {
+    position: relative;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    color: white;
+  }
+  
+  .alert-card.error {
+    background-color: #ff5b5b;
+    box-shadow: 0 5px 15px rgba(255, 91, 91, 0.2);
+  }
+  
+  .alert-card.success {
+    background-color: #80c244;
+    box-shadow: 0 5px 15px rgba(128, 194, 68, 0.2);
+  }
+  
+  .alert-close {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: white;
+    opacity: 0.7;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .alert-close:hover {
+    opacity: 1;
+  }
+  
+  /* Stat Cards */
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
   }
-  .btn-danger {
-    background-color: #dc3545;
-    color: #fff;
+  
+  .stat-card-body {
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #f2f9ed, #e6f4da);
+    color: #80c244;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(128, 194, 68, 0.15);
+  }
+  
+  .stat-content {
+    flex: 1;
+  }
+  
+  .stat-title {
+    color: #6c757d;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+  }
+  
+  .stat-value {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  
+  .stat-latest-user {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-name {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .user-email {
+    color: #495057;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .user-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+  }
+  
+  /* Users Table Card */
+  .users-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin-bottom: 3rem;
+  }
+  
+  .users-card-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .section-title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  .users-card-body {
+    padding: 1rem;
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .users-table th {
+    color: #6c757d;
+    font-weight: 600;
+    padding: 1rem;
+    font-size: 0.95rem;
+    text-align: left;
+    border-bottom: 2px solid #f1f3f5;
+  }
+  
+  .users-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+    color: #495057;
+  }
+  
+  .users-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .users-table tbody tr {
+    transition: all 0.3s;
+  }
+  
+  .users-table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .role-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .role-badge.admin {
+    background-color: #ff5b5b;
+    color: white;
+    box-shadow: 0 2px 5px rgba(255, 91, 91, 0.2);
+  }
+  
+  .role-badge.user {
+    background-color: #80c244;
+    color: white;
+    box-shadow: 0 2px 5px rgba(128, 194, 68, 0.2);
+  }
+  
+  .action-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
     border: none;
   }
-  .btn-danger:hover {
-    transform: translateY(-3px);
+  
+  .delete-btn {
+    background-color: #fff0f0;
+    color: #ff5b5b;
+    border: 1px solid rgba(255, 91, 91, 0.2);
   }
-  .btn-secondary {
-    background-color: #6c757d;
-    color: #fff;
+  
+  .delete-btn:hover {
+    background-color: #ff5b5b;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 91, 91, 0.2);
+  }
+  
+  .admin-btn {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+    border: 1px solid #e9ecef;
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+  
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .delete-modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .modal-title {
+    color: #2c3e50;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .modal-close:hover {
+    color: #ff5b5b;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+    color: #495057;
+    font-size: 1.1rem;
+  }
+  
+  .warning-text {
+    color: #ff5b5b;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-top: 1rem;
+  }
+  
+  .modal-footer {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .modal-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
   }
-  .btn-secondary:hover {
-    transform: translateY(-3px);
+  
+  .cancel-btn {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #e9ecef;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #e9ecef;
+  }
+  
+  .confirm-btn {
+    background-color: #ff5b5b;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 91, 91, 0.2);
+  }
+  
+  .confirm-btn:hover {
+    background-color: #ff3333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 91, 91, 0.3);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .gradient-text {
+      font-size: 2.25rem;
+    }
+    
+    .stat-card-body {
+      padding: 1.5rem;
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .stat-icon {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .users-card-header,
+    .users-card-body {
+      padding: 1rem;
+    }
+    
+    .users-table th,
+    .users-table td {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.85rem;
+    }
+    
+    .action-btn {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+    }
   }
 </style>

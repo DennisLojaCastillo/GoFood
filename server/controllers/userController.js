@@ -93,6 +93,33 @@ export const userController = (db) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
+  
+  // Get user's favorite recipes
+  const getUserFavorites = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get favorite recipe IDs from user
+      const favoriteIds = await User.getFavorites(userId);
+      
+      if (!favoriteIds.length) {
+        return res.status(200).json([]);
+      }
+      
+      // Convert string IDs to ObjectId if needed
+      const objectIdFavorites = favoriteIds.map(id => 
+        typeof id === 'string' ? new ObjectId(id) : id
+      );
+      
+      // Find all recipes that match the favorite IDs
+      const favoriteRecipes = await Recipe.findByIds(objectIdFavorites);
+      
+      res.status(200).json(favoriteRecipes);
+    } catch (error) {
+      console.error('Error getting favorite recipes:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
 
   const updateFavorites = async (req, res) => {
     try {
@@ -157,6 +184,7 @@ export const userController = (db) => {
     getProfile,
     updateProfile,
     getUserRecipes,
+    getUserFavorites,
     updateFavorites
   };
 };

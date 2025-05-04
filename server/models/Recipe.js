@@ -22,6 +22,15 @@ export default function RecipeModel(db) {
     return await getRecipeById(id);
   };
 
+  // Find multiple recipes by an array of IDs
+  const findByIds = async (recipeIds) => {
+    if (!recipeIds || !recipeIds.length) return [];
+    
+    return await collection.find({
+      _id: { $in: recipeIds }
+    }).toArray();
+  };
+
   const updateRecipe = async (id, updateData) => {
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
@@ -92,6 +101,7 @@ export default function RecipeModel(db) {
     getAllRecipes,
     getRecipeById,
     findById,
+    findByIds,
     updateRecipe,
     deleteRecipe,
     findByUser,

@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-// Funktion til at hente notifikationer fra localStorage
+// Function to retrieve notifications from localStorage
 function getNotificationsFromStorage() {
   if (typeof window !== 'undefined') {
     const storedNotifications = localStorage.getItem('notifications');
@@ -15,21 +15,21 @@ function getNotificationsFromStorage() {
   return { items: [], unreadCount: 0 };
 }
 
-// Opretter en writable store med notifikationer
+// Create a writable store with notifications
 const notificationStore = writable(getNotificationsFromStorage());
 
-// Funktion til at gemme notifikationer i localStorage
+// Function to save notifications to localStorage
 function saveNotificationsToStorage(state) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('notifications', JSON.stringify(state));
   }
 }
 
-// Svelte store med custom metoder
+// Svelte store with custom methods
 export const notifications = {
   subscribe: notificationStore.subscribe,
   
-  // Funktion til at tilføje en ny notifikation
+  // Function to add a new notification
   addNotification: (message) => {
     console.log('Adding notification:', message);
     notificationStore.update(state => {
@@ -42,21 +42,21 @@ export const notifications = {
     });
   },
   
-  // Funktion til at markere en specifik notifikation som læst
+  // Function to mark a specific notification as read
   markAsRead: (index) => {
     notificationStore.update(state => {
-      // Opret en kopi af items array
+      // Create a copy of the items array
       const items = [...state.items];
       
-      // Hvis notifikationen allerede er læst, gør intet
+      // If the notification is already read, do nothing
       if (items[index] && items[index].read) return state;
       
-      // Markér notifikationen som læst
+      // Mark the notification as read
       if (items[index]) {
         items[index] = { ...items[index], read: true };
       }
       
-      // Tæl ulæste notifikationer igen
+      // Count unread notifications again
       const unreadCount = items.filter(item => !item.read).length;
       
       const newState = { items, unreadCount };
@@ -65,7 +65,7 @@ export const notifications = {
     });
   },
   
-  // Funktion til at markere alle notifikationer som læst
+  // Function to mark all notifications as read
   markAllAsRead: () => {
     notificationStore.update(state => {
       const items = state.items.map(item => ({ ...item, read: true }));
@@ -75,7 +75,7 @@ export const notifications = {
     });
   },
   
-  // Funktion til at fjerne en notifikation
+  // Function to remove a notification
   removeNotification: (index) => {
     notificationStore.update(state => {
       const items = state.items.filter((_, i) => i !== index);
@@ -86,7 +86,7 @@ export const notifications = {
     });
   },
   
-  // Egenskab til at få antallet af ulæste notifikationer
+  // Property to get the number of unread notifications
   get unreadCount() {
     let count = 0;
     notificationStore.subscribe(state => {
@@ -95,7 +95,7 @@ export const notifications = {
     return count;
   },
   
-  // Egenskab til at få alle notifikationer
+  // Property to get all notifications
   get items() {
     let items = [];
     notificationStore.subscribe(state => {

@@ -36,11 +36,19 @@ export default function UserModel(db) {
     return result.modifiedCount > 0;
   };
 
+  const getFavorites = async (userId) => {
+    const user = await findById(userId);
+    if (!user || !user.favorites) return [];
+    
+    return user.favorites;
+  };
+
   return {
     createUser,
     findByEmail,
     findById,
     updateUser,
-    updateFavorites
+    updateFavorites,
+    getFavorites
   };
 }
