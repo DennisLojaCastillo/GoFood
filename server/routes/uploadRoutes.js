@@ -4,7 +4,6 @@ import { verifyToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// Multer konfiguration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -16,7 +15,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Route
 router.post('/api/upload', verifyToken, upload.single('image'), (req, res) => {
   res.status(200).json({ imageUrl: `/uploads/${req.file.filename}` });
 });

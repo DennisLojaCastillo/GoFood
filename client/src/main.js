@@ -8,11 +8,11 @@ import { user } from './stores/auth.js'
 import { get } from 'svelte/store'
 
 const socket = io('http://localhost:3000', {
-  transports: ['websocket', 'polling'], // Enable fallback to polling
+  transports: ['websocket', 'polling'], // Muliggør fallback til polling
   withCredentials: true
 })
 
-// Emit 'register' event after connecting to the server
+// Udsend 'register' event efter forbindelse til serveren
 socket.on('connect', () => {
   registerCurrentUser();
 })

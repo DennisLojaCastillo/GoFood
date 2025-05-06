@@ -7,14 +7,10 @@ import { verifyToken } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 const controller = userController(db);
 
-// Profile management routes
 router.get('/api/user/profile', verifyToken, controller.getProfile);
 router.put('/api/user/profile', verifyToken, controller.updateProfile);
 
-// User recipes routes
 router.get('/api/user/recipes', verifyToken, controller.getUserRecipes);
-
-// Favorites management routes
 router.get('/api/user/favorites', verifyToken, controller.getUserFavorites);
 router.post('/api/user/favorites', verifyToken, controller.updateFavorites);
 

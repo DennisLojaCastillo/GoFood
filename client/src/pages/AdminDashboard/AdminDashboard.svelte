@@ -123,11 +123,19 @@
         users = users.filter(user => {        
           return user._id !== userToDelete;
         });
-        deleteSuccess = 'User deleted';
+        
+        // Also remove all recipes by this user from the recipes list
+        recipes = recipes.filter(recipe => {
+          return recipe.createdBy !== userToDelete;
+        });
+        
+        deleteSuccess = 'User and all associated recipes deleted';
 
         // Update overview counts
         if (overviewData) {
+          const deletedUserRecipeCount = users.find(u => u._id === userToDelete)?.recipeCount || 0;
           overviewData.totalUsers -= 1;
+          overviewData.totalRecipes -= deletedUserRecipeCount;
         }
       } else if (deleteType === 'recipe') {
         const response = await fetch(`http://localhost:3000/api/admin/recipes/${recipeToDelete}`, {
@@ -238,7 +246,7 @@
                   <i class="fas fa-user-plus"></i>
                 </div>
                 <div class="stat-content">
-                  <h5 class="stat-title">Latest User</h5>
+                  <h5 class="stat-title">Latest User Created</h5>
                   <div class="stat-latest-user">
                     <span class="user-name">{overviewData.latestUser.name}</span>
                     <span class="user-email">{overviewData.latestUser.email}</span>
@@ -249,8 +257,7 @@
             </div>
           </div>
         </div>
-
-        <!-- Delete messages -->
+        
         {#if deleteSuccess}
           <div class="alert-card success" role="alert" in:fade={{ duration: 300 }}>
             <i class="fas fa-check-circle me-2"></i> {deleteSuccess}
@@ -281,25 +288,25 @@
               <table class="users-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Recipe Count</th>
-                    <th>Actions</th>
+                    <th class="text-left">Name</th>
+                    <th class="text-center">Email</th>
+                    <th class="text-center">Role</th>
+                    <th class="text-center">Recipe Count</th>
+                    <th class="text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {#each users as user, i}
                     <tr in:fade={{ duration: 300, delay: 500 + (i * 50) }}>
                       <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>
+                      <td class="text-center">{user.email}</td>
+                      <td class="text-center">
                         <span class="role-badge {user.role === 'admin' ? 'admin' : 'user'}">
                           {user.role === 'admin' ? 'Administrator' : 'User'}
                         </span>
                       </td>
-                      <td>{user.recipeCount}</td>
-                      <td>
+                      <td class="text-center">{user.recipeCount}</td>
+                      <td class="text-center">
                         {#if user.role !== 'admin'}
                           <button 
                             class="action-btn delete-btn" 
@@ -332,11 +339,11 @@
               <table class="users-table">
                 <thead>
                   <tr>
-                    <th>Title</th>
-                    <th>Created By</th>
-                    <th>User Email</th>
-                    <th>Favorites</th>
-                    <th>Actions</th>
+                    <th class="text-left">Title</th>
+                    <th class="text-center">Created By</th>
+                    <th class="text-center">User Email</th>
+                    <th class="text-center">Favorites</th>
+                    <th class="text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -352,14 +359,14 @@
                           <span>{recipe.title}</span>
                         </div>
                       </td>
-                      <td>{recipe.createdByName}</td>
-                      <td>{recipe.createdByEmail}</td>
-                      <td>
+                      <td class="text-center">{recipe.createdByName}</td>
+                      <td class="text-center">{recipe.createdByEmail}</td>
+                      <td class="text-center">
                         <span class="favorites-badge">
                           <i class="fas fa-heart me-1"></i> {recipe.favoritesCount}
                         </span>
                       </td>
-                      <td>
+                      <td class="text-center">
                         <button 
                           class="action-btn delete-btn" 
                           on:click={() => confirmDelete(recipe._id, 'recipe')}>
@@ -603,6 +610,56 @@
     vertical-align: middle;
     border-bottom: 1px solid #f1f3f5;
     color: #495057;
+  }
+  
+  .text-left {
+    text-align: left !important;
+  }
+  
+  .text-center {
+    text-align: center !important;
+  }
+  
+  /* Users tabel alignment */
+  .users-card:nth-of-type(1) .users-table th:nth-child(2),
+  .users-card:nth-of-type(1) .users-table td:nth-child(2) {
+    text-align: center; /* Email */
+  }
+  
+  .users-card:nth-of-type(1) .users-table th:nth-child(3),
+  .users-card:nth-of-type(1) .users-table td:nth-child(3) {
+    text-align: center; /* Role */
+  }
+  
+  .users-card:nth-of-type(1) .users-table th:nth-child(4),
+  .users-card:nth-of-type(1) .users-table td:nth-child(4) {
+    text-align: center; /* Recipe Count */
+  }
+  
+  .users-card:nth-of-type(1) .users-table th:nth-child(5),
+  .users-card:nth-of-type(1) .users-table td:nth-child(5) {
+    text-align: center; /* Actions */
+  }
+  
+  /* Recipes tabel alignment */
+  .users-card:nth-of-type(2) .users-table th:nth-child(2),
+  .users-card:nth-of-type(2) .users-table td:nth-child(2) {
+    text-align: center; /* Created By */
+  }
+  
+  .users-card:nth-of-type(2) .users-table th:nth-child(3),
+  .users-card:nth-of-type(2) .users-table td:nth-child(3) {
+    text-align: center; /* User Email */
+  }
+  
+  .users-card:nth-of-type(2) .users-table th:nth-child(4),
+  .users-card:nth-of-type(2) .users-table td:nth-child(4) {
+    text-align: center; /* Favorites */
+  }
+  
+  .users-card:nth-of-type(2) .users-table th:nth-child(5),
+  .users-card:nth-of-type(2) .users-table td:nth-child(5) {
+    text-align: center; /* Actions */
   }
   
   .users-table tr:last-child td {

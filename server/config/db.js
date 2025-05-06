@@ -7,10 +7,8 @@ const dbName = 'GoFood';
 
 export const connectDB = async () => {
   try {
-    await client.connect();
-    // Database connection successful
-  } catch (error) {
-    // Database connection failed
+    await client.connect();    
+  } catch (error) {    
     process.exit(1);
   }
 };

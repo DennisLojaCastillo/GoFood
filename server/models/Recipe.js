@@ -16,13 +16,11 @@ export default function RecipeModel(db) {
   const getRecipeById = async (id) => {
     return await collection.findOne({ _id: new ObjectId(id) });
   };
-
-  // Alias for getRecipeById for consistency
+  
   const findById = async (id) => {
     return await getRecipeById(id);
   };
 
-  // Find multiple recipes by an array of IDs
   const findByIds = async (recipeIds) => {
     if (!recipeIds || !recipeIds.length) return [];
     
@@ -62,18 +60,16 @@ export default function RecipeModel(db) {
     return result.modifiedCount > 0;
   };
 
-  // Find recipes created by a specific user
   const findByUser = async (userId) => {
     return await collection.find({ 
       createdBy: userId 
     }).toArray();
   };
   
-  // Get recipes with pagination
   const getRecipes = async (page = 1, limit = 10, filter = {}) => {
     const skip = (page - 1) * limit;
     const recipes = await collection.find(filter)
-      .sort({ createdAt: -1 }) // Newest first
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .toArray();

@@ -5,7 +5,6 @@
   import user3 from '../../assets/images/user3.jpg';
   import heroFood from '../../assets/images/Hero_food.png';
   
-  // Animation on scroll
   onMount(() => {
     const observerOptions = {
       threshold: 0.1,
@@ -25,8 +24,7 @@
       observer.observe(section);
     });
   });
-
-  // Milestones data
+  
   const milestones = [
     {
       year: '2020',
@@ -50,7 +48,6 @@
     }
   ];
 
-  // Team data
   const teamMembers = [
     {
       name: 'Sophie Larson',
@@ -72,7 +69,6 @@
     }
   ];
 
-  // Values
   const values = [
     {
       title: 'Community',
@@ -136,7 +132,6 @@
   </div>
 </section>
 
-<!-- Our Story Section -->
 <section class="our-story-section py-5 fade-in-section">
   <div class="container">
     <div class="section-header text-center mb-5">
@@ -164,7 +159,6 @@
   </div>
 </section>
 
-<!-- Our Values Section -->
 <section class="values-section py-5 fade-in-section">
   <div class="container">
     <div class="section-header text-center mb-5">
@@ -189,7 +183,6 @@
   </div>
 </section>
 
-<!-- Meet the Team Section -->
 <section class="team-section py-5 fade-in-section">
   <div class="container">
     <div class="section-header text-center mb-5">
@@ -225,7 +218,6 @@
   </div>
 </section>
 
-<!-- Join Us CTA Section -->
 <section class="about-cta-section py-5 text-center fade-in-section">
   <div class="container">
     <div class="cta-content p-5 rounded-lg">
@@ -240,7 +232,6 @@
 </section>
 
 <style>
-  /* Hero Section */
   .about-hero-section {
     background-color: #ffffff;
     padding: 100px 0 80px;
@@ -318,7 +309,6 @@
     left: 0;
   }
   
-  /* Section Styles */
   .section-header {
     margin-bottom: 3rem;
   }
@@ -344,7 +334,6 @@
     margin-bottom: 2rem;
   }
   
-  /* Timeline Styles */
   .timeline {
     position: relative;
     padding: 20px 0;
@@ -415,7 +404,6 @@
     margin-bottom: 0;
   }
   
-  /* Values Section */
   .value-card {
     background: white;
     padding: 30px 20px;
@@ -447,7 +435,6 @@
     color: #6c757d;
   }
   
-  /* Team Section */
   .team-card {
     background: white;
     border-radius: 15px;
@@ -522,7 +509,6 @@
     color: white;
   }
   
-  /* CTA Section */
   .about-cta-section {
     margin: 50px 0;
   }

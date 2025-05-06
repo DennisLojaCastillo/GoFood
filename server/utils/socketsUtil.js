@@ -1,5 +1,3 @@
-import { Server } from 'socket.io';
-
 let io;
 const userSocketMap = new Map();
 
@@ -23,6 +21,3 @@ export const messagesSocket = (server) => {
     });
   });
 };
-
-// Export userSocketMap for debugging purposes
-export { userSocketMap };
